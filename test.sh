@@ -74,9 +74,9 @@ for subdir in $subdirs; do
             printf  "${CYAN}Test ${test_number}\n${DEF_COLOR}"
             
             if [ "$UNAME" = "Linux" ]; then
-                leak_status=$(valgrind --leak-check=full --show-leak-kinds=all --log-fd=1 $PROGRAM $file_path 2>&1 | grep -Ec 'no leaks are possible|ERROR SUMMARY: 0')
-                segfault_status=$(valgrind --leak-check=full --show-leak-kinds=all --log-fd=1 $PROGRAM $file_path 2>&1 | grep -w '(SIGSEGV)')
                 valgrind --leak-check=full --show-leak-kinds=all "$PROGRAM" "$file_path" > $OUTPUT/$subdir_name/$file_name 2>&1
+                leak_status=$(grep -Ec 'no leaks are possible|ERROR SUMMARY: 0' $OUTPUT/$subdir_name/$file_name)
+                segfault_status=$(grep -w '(SIGSEGV)' $OUTPUT/$subdir_name/$file_name)
             else
                 printf "APPLE"
             fi
