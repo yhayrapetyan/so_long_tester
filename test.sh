@@ -11,18 +11,20 @@ CYAN='\033[0;96m'
 GRAY='\033[0;90m'
 WHITE='\033[0;97m'
 
+PROGRAM=$PWD/../so_long
+INVALID_MAPS="$PWD/Test_maps/invalid"
+OUTPUT="$PWD/Test_results"
+ERRORS_COUNT=0
+
 action=$1
 default_action="default"
 
-# Check if an argument is provided
 if [ $# -eq 1 ]; then
     action=$1
 else
     action=$default_action
 fi
 
-
-# Perform different actions based on the argument
 case $action in
     clean)
         rm -rf Test_results
@@ -45,15 +47,6 @@ printf ${YELLOW}"\n\t\tTEST CREATED BY: "${DEF_COLOR};
 printf ${CYAN}"Me :)\t\n"${DEF_COLOR};
 printf ${BLUE}"\n-------------------------------------------------------------\n"${DEF_COLOR};
 
-
-
-rm -rf Test_results
-
-PROGRAM=$PWD/../so_long
-INVALID_MAPS="$PWD/Test_maps/invalid"
-OUTPUT="$PWD/Test_results"
-ERRORS_COUNT=0
-
 make -C "$PWD/../" re
 
 if [ -f "$PROGRAM" ]; then
@@ -63,12 +56,10 @@ else
 	exit 1
 fi
 
-
+rm -rf Test_results
 mkdir Test_results
 
-
 subdirs=$(ls -d "$INVALID_MAPS"/* 2>/dev/null)
-# Iterate over each subdirectory
 for subdir in $subdirs; do
     test_number=1
     subdir_name=$(basename "$subdir")
@@ -96,5 +87,5 @@ done
 if [ "$ERRORS_COUNT" -ne 0 ]; then
     printf "${RED}\nProgram have some errors${DEF_COLOR}\n\n";
 else
-    printf "${GREEN}\nGood job! Everything works correctly${DEF_COLOR}\n\n"
+    printf "${GREEN}\nGood job! Everything works correctly 🥳✅${DEF_COLOR}\n\n"
 fi
