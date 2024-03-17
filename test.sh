@@ -72,19 +72,28 @@ for subdir in $subdirs; do
         if [ -f "$file_path" ]; then
             file_name="${file_path##*/}"
             printf  "${CYAN}Test ${test_number}\n${DEF_COLOR}"
+            
             if [ "$UNAME" = "Linux" ]; then
-                exit_status=$(valgrind --leak-check=full --show-leak-kinds=all --log-fd=1 $PROGRAM $file_path | grep -Ec 'no leaks are possible|ERROR SUMMARY: 0')
+                leak_status=$(valgrind --leak-check=full --show-leak-kinds=all --log-fd=1 $PROGRAM $file_path | grep -Ec 'no leaks are possible|ERROR SUMMARY: 0')
+                segfault_status=$(valgrind --leak-check=full --show-leak-kinds=all --log-fd=1 $PROGRAM $file_path | grep -w '(SIGSEGV)')
                 valgrind --leak-check=full --show-leak-kinds=all "$PROGRAM" "$file_path" > $OUTPUT/$subdir_name/$file_name 2>&1
             else
                 printf "APPLE"
             fi
-            if [[ $exit_status == 2 ]]; then
-                printf "${GREEN}[OK LEAKS] ${DEF_COLOR}\n";
-            else
-                printf "${RED} [KO LEAKS] ${DEF_COLOR}\n";
+
+            if [[ -n $segfault_status ]]; then
+                printf "${YELLOW} (SIGSEGV) ${DEF_COLOR}\n";
                 ((ERRORS_COUNT++))
+	    else
+	        if [[ $leak_status == 2 ]]; then
+	        	printf "${GREEN}[OK LEAKS] ${DEF_COLOR}\n\n";
+	    	else
+	        	printf "${RED} [KO LEAKS] ${DEF_COLOR}\n\n";
+	        	((ERRORS_COUNT++))
+            	fi
             fi
             ((test_number++))
+            
         fi
     done
 done
