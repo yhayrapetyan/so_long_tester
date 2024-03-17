@@ -15,6 +15,7 @@ PROGRAM=$PWD/../so_long
 INVALID_MAPS="$PWD/Test_maps/invalid"
 OUTPUT="$PWD/Test_results"
 ERRORS_COUNT=0
+UNAME=$(uname -s)
 
 action=$1
 default_action="default"
@@ -71,9 +72,13 @@ for subdir in $subdirs; do
         if [ -f "$file_path" ]; then
             file_name="${file_path##*/}"
             printf  "${CYAN}Test ${test_number}\n${DEF_COLOR}"
-            valgrind_exit_status=$(valgrind --leak-check=full --show-leak-kinds=all --log-fd=1 $PROGRAM $file_path | grep -Ec 'no leaks are possible|ERROR SUMMARY: 0')
-            valgrind --leak-check=full --show-leak-kinds=all "$PROGRAM" "$file_path" > $OUTPUT/$subdir_name/$file_name 2>&1
-            if [[ $valgrind_exit_status == 2 ]]; then
+            if [ "$UNAME" = "Linux" ]; then
+                exit_status=$(valgrind --leak-check=full --show-leak-kinds=all --log-fd=1 $PROGRAM $file_path | grep -Ec 'no leaks are possible|ERROR SUMMARY: 0')
+                valgrind --leak-check=full --show-leak-kinds=all "$PROGRAM" "$file_path" > $OUTPUT/$subdir_name/$file_name 2>&1
+            else
+                printf "APPLE"
+            fi
+            if [[ $exit_status == 2 ]]; then
                 printf "${GREEN}[OK LEAKS] ${DEF_COLOR}\n";
             else
                 printf "${RED} [KO LEAKS] ${DEF_COLOR}\n";
