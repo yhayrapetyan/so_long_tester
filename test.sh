@@ -72,13 +72,13 @@ for subdir in $subdirs; do
         if [ -f "$file_path" ]; then
             file_name="${file_path##*/}"
             printf  "${CYAN}Test ${test_number}\n${DEF_COLOR}"
-            
+
             if [ "$UNAME" = "Linux" ]; then
                 valgrind --leak-check=full --show-leak-kinds=all "$PROGRAM" "$file_path" > $OUTPUT/$subdir_name/$file_name 2>&1
                 leak_status=$(grep -Ec 'no leaks are possible|ERROR SUMMARY: 0' $OUTPUT/$subdir_name/$file_name)
                 segfault_status=$(grep -w '(SIGSEGV)' $OUTPUT/$subdir_name/$file_name)
             else
-                printf "APPLE"
+				"$PROGRAM" "$file_path" > $OUTPUT/$subdir_name/$file_name 2>&1
             fi
 
             if [[ -n $segfault_status ]]; then
@@ -93,7 +93,7 @@ for subdir in $subdirs; do
             	fi
             fi
             ((test_number++))
-            
+
         fi
     done
 done
